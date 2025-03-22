@@ -106,6 +106,41 @@ $router->map('GET', '/admin', function () {
     $userController->admin();
 });
 
+$router->map('GET', '/dashboard', function() {
+    AuthMiddleware::auth();
+    $db = Database::getInstance();
+    $userController = new UserController($db);
+    $userController->dashboard();
+});
+
+$router->map('GET|POST', '/profile', function() {
+    AuthMiddleware::auth();
+    $db = Database::getInstance();
+    $userController = new UserController($db);
+    $userController->profile();
+});
+
+$router->map('GET', '/my-listings', function() {
+    AuthMiddleware::auth();
+    $db = Database::getInstance();
+    $userController = new UserController($db);
+    $userController->myListings();
+});
+
+$router->map('GET|POST', '/listing/edit/[i:id]', function($id) {
+    AuthMiddleware::auth();
+    $db = Database::getInstance();
+    $listingController = new ListingController($db);
+    $listingController->edit($id);
+});
+
+$router->map('POST', '/listing/delete/[i:id]', function($id) {
+    AuthMiddleware::auth();
+    $db = Database::getInstance();
+    $listingController = new ListingController($db);
+    $listingController->delete($id);
+});
+
 // Matcher et gérer la requête
 $match = $router->match();
 

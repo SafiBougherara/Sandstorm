@@ -1,0 +1,52 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Dashboard</h1>
+    
+    <div class="row">
+        <!-- User Info -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <i class="bi bi-person-circle display-1"></i>
+                    </div>
+                    <h5 class="card-title text-center">{{ user.username }}</h5>
+                    <p class="text-muted text-center">{{ user.email }}</p>
+                    <hr>
+                    <div class="d-grid gap-2">
+                        <a href="/Sandstorm/profile" class="btn btn-outline-primary">Edit Profile</a>
+                        <a href="/Sandstorm/my-listings" class="btn btn-outline-primary">My Listings</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Recent Listings</h5>
+                    {% if listings|length > 0 %}
+                    <div class="list-group">
+                        {% for listing in listings %}
+                        <a href="/Sandstorm/listing/{{ listing.id }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ listing.title }}</h6>
+                                <small class="text-muted">{{ listing.created_at|date("d/m/Y") }}</small>
+                            </div>
+                            <p class="mb-1 text-primary">{{ listing.price }}€</p>
+                            <small class="text-muted">{{ listing.location }}</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">You haven't created any listings yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

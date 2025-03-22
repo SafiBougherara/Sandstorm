@@ -1,0 +1,73 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>My Listings</h1>
+        <a href="/Sandstorm/sell" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> New Listing
+        </a>
+    </div>
+
+    {% if listings|length > 0 %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for listing in listings %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                {% if listing.image %}
+                <img src="/Sandstorm/uploads/listings/{{ listing.image }}" class="card-img-top" alt="{{ listing.title }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="bi bi-image fs-1"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title text-truncate">{{ listing.title }}</h5>
+                    <p class="card-text text-primary fw-bold">{{ listing.price }}€</p>
+                    <p class="card-text text-muted small mb-0">{{ listing.location }}</p>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">{{ listing.created_at|date("d/m/Y") }}</small>
+                        <div class="btn-group">
+                            <a href="/Sandstorm/listing/edit/{{ listing.id }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ listing.id }}">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Modal -->
+            <div class="modal fade" id="deleteModal{{ listing.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Delete Listing</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete "{{ listing.title }}"?</p>
+                            <p class="text-danger mb-0">This action cannot be undone.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <form action="/Sandstorm/listing/delete/{{ listing.id }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <h3 class="mt-3">No Listings Yet</h3>
+        <p class="text-muted">Start selling by creating your first listing!</p>
+        <a href="/Sandstorm/sell" class="btn btn-primary mt-3">Create Listing</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

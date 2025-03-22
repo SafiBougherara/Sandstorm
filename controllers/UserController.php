@@ -1,15 +1,18 @@
 <?php
 namespace Controllers;
 use Models\UserModel;
+use Models\ListingModel;
 
 class UserController extends Controller
 {
     private UserModel $userModel;
+    private ListingModel $listingModel;
 
     public function __construct($db)
     {
         parent::__construct($db);
         $this->userModel = new UserModel($db);
+        $this->listingModel = new ListingModel($db);
     }
 
     /**
@@ -63,7 +66,6 @@ class UserController extends Controller
                 if ($password === $passwordConfirm) {
                     if (strlen($password) >= 8) {
                         try {
-                            // Check if email already exists
                             if ($this->userModel->getUserByEmail($email)) {
                                 $error = 'Email déjà enregistré';
                             } else {
@@ -125,5 +127,67 @@ class UserController extends Controller
         ];
 
         $this->render("admin.html.twig", $data);
+    }
+
+    /**
+     * Display user dashboard
+     */
+    public function dashboard()
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /Sandstorm/login');
+            exit;
+        }
+
+        $user = $this->userModel->getUserById($_SESSION['user_id']);
+        $listings = $this->listingModel->getUserListings($_SESSION['user_id']);
+
+        $data = [
+            "title" => "Dashboard",
+            "user" => $user,
+            "listings" => $listings
+        ];
+
+        $this->render("user/dashboard.html.twig", $data);
+    }
+
+    /**
+     * Display user profile
+     */
+    public function profile()
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /Sandstorm/login');
+            exit;
+        }
+
+        $user = $this->userModel->getUserById($_SESSION['user_id']);
+
+        $data = [
+            "title" => "Profile",
+            "user" => $user
+        ];
+
+        $this->render("user/profile.html.twig", $data);
+    }
+
+    /**
+     * Display user's listings
+     */
+    public function myListings()
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /Sandstorm/login');
+            exit;
+        }
+
+        $listings = $this->listingModel->getUserListings($_SESSION['user_id']);
+
+        $data = [
+            "title" => "My Listings",
+            "listings" => $listings
+        ];
+
+        $this->render("user/my-listings.html.twig", $data);
     }
 }
