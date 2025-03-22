@@ -24,7 +24,7 @@ class HomeController extends Controller
         $recentListings = $this->listingModel->getRecentListings(8); // Get 8 most recent listings
 
         $data = [
-            "title" => "Marketplace - Find What You Need",
+            "title" => "sandstorm 🌪️ - Find What You Need",
             "categories" => $categories,
             "recent_items" => $recentListings
         ];
