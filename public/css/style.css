@@ -1,0 +1,42 @@
+/* Custom Bootstrap color overrides */
+:root {
+    /* Override Bootstrap's default colors */
+    --bs-primary: #e2b44a;        /* Custom gold */
+    --bs-secondary: #6c757d;
+    --bs-success: #2ecc71;        /* Custom green */
+    --bs-info: #3498db;          /* Custom light blue */
+    --bs-warning: #f1c40f;       /* Custom yellow */
+    --bs-danger: #e74c3c;        /* Custom red */
+    --bs-light: #f8f9fa;
+    --bs-dark: #343a40;
+}
+
+/* Update button colors */
+.btn-primary {
+    background-color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+}
+
+.btn-primary:hover {
+    filter: brightness(90%);
+}
+
+.btn-outline-primary {
+    color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--bs-primary) !important;
+    color: white !important;
+}
+
+/* Background colors */
+.bg-primary {
+    background-color: var(--bs-primary) !important;
+}
+
+/* Text colors */
+.text-primary {
+    color: var(--bs-primary) !important;
+}
