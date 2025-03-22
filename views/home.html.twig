@@ -1,0 +1,76 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section class="bg-primary text-white py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="display-4">Find What You Need</h1>
+                    <p class="lead">Browse thousands of items or list your own</p>
+                </div>
+                <div class="col-md-6">
+                    <form class="d-flex" action="/Sandstorm/search" method="GET">
+                        <input type="search" name="q" class="form-control form-control-lg me-2" placeholder="Search items...">
+                        <button class="btn btn-light btn-lg" type="submit">Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Categories -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="mb-4">Popular Categories</h2>
+            <div class="row g-4">
+                {% for category in categories %}
+                <div class="col-md-3">
+                    <a href="/Sandstorm/category/{{ category.slug }}" class="text-decoration-none">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi {{ category.icon }} fs-1 mb-3 text-primary"></i>
+                                <h5 class="card-title">{{ category.name }}</h5>
+                                <p class="text-muted">{{ category.count }} items</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Listings -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="mb-4">Recent Listings</h2>
+            <div class="row g-4">
+                {% for item in recent_items %}
+                <div class="col-md-3">
+                    <div class="card h-100">
+                        {% if item.image %}
+                            <img src="{{ item.image }}" class="card-img-top" alt="{{ item.title }}">
+                        {% else %}
+                            <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="bi bi-image fs-1"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item.title }}</h5>
+                            <p class="card-text text-primary fw-bold">${{ item.price }}</p>
+                            <p class="card-text text-muted small">{{ item.location }}</p>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <small class="text-muted">Listed {{ item.created_at }}</small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-4">
+                <a href="/Sandstorm/browse" class="btn btn-primary">View All Listings</a>
+            </div>
+        </div>
+    </section>
+{% endblock %}

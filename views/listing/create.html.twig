@@ -1,0 +1,103 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Sandstorm/">Home</a></li>
+            <li class="breadcrumb-item active">Create Listing</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body p-4">
+                    <h1 class="card-title h3 mb-4">Create a New Listing</h1>
+
+                    {% if errors is defined and errors|length > 0 %}
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            {% for error in errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <form action="/Sandstorm/listing/store" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required 
+                                   value="{{ old.title ?? '' }}" maxlength="255">
+                            <div class="form-text">Be clear and descriptive about what you're selling</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category_id" class="form-label">Category</label>
+                            <select class="form-select" id="category_id" name="category_id" required>
+                                <option value="">Select a category</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}" {{ (old.category_id ?? '') == category.id ? 'selected' : '' }}>
+                                    {{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="price" name="price" required 
+                                       step="0.01" min="0" value="{{ old.price ?? '' }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" required 
+                                   value="{{ old.location ?? '' }}">
+                            <div class="form-text">Enter city, state, or region</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="5" required>{{ old.description ?? '' }}</textarea>
+                            <div class="form-text">
+                                Include details about condition, features, and why you're selling
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="images" class="form-label">Images</label>
+                            <input type="file" class="form-control" id="images" name="images[]" accept="image/*" multiple>
+                            <div class="form-text">
+                                You can upload up to 5 images. First image will be the main image.
+                                Supported formats: JPG, PNG, GIF
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Create Listing</button>
+                            <a href="/Sandstorm/" class="btn btn-link">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.getElementById('images').addEventListener('change', function(e) {
+    if (this.files.length > 5) {
+        alert('You can only upload up to 5 images');
+        this.value = '';
+    }
+});
+</script>
+{% endblock %}
+
+{% endblock %}

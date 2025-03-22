@@ -1,0 +1,49 @@
+<div class="col-6 mt-5">
+    <div class="row">
+        
+    {% for ticket in tickets %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <strong> {{ ticket.title }}</strong>
+                
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Statut : {{ ticket.status }}</h5> <!-- Affichage du statut -->
+                <p class="card-text">{{ ticket.content }}</p> <!-- Affichage du contenu -->
+
+                <!-- Vérification de l'admin_id -->
+                <p class="card-text">
+                    {% if ticket.admin_id is null %}
+                        <span class="text-warning">Pas encore attribué à un admin.</span>
+                    {% endif %}
+                    {% if ticket.admin_id == user_id %}
+                        <span class="text-success">Votre ticket</span>
+                    {% endif %}
+                </p>
+                
+            </div>
+        </div>
+    {% endfor %}
+
+    </div>
+    
+
+</div>
+<div class="col-6 mt-5">
+    <h1 class="text-center">Ajout d'un ticket</h1>
+    <form action="/Sandstorm/create_ticket" method="POST" >
+       
+        <div class="mt-5">
+            <label for="title" >Titre du ticket </label>
+            <input type="text" id="title" name="title" class="form-control" required>   
+        </div>
+        <div class="mt-5">
+            <label for="content" >Contenu du ticket </label>
+            <textarea type="text" id="content" name="content" class="form-control" required> 
+             </textarea>     
+        </div>
+        <div class="mt-5">
+            <button type="submit" class="btn btn-primary" >Créer le ticket</button>
+        </div>
+    </form>
+</div>
