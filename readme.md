@@ -1,73 +1,131 @@
+# 🌪️ Sandstorm Marketplace
 
+A modern, feature-rich marketplace platform built with PHP 8.2+ and MySQL. Sandstorm allows users to buy and sell items in various categories with a beautiful, responsive interface.
 
+![Sandstorm Screenshot](docs/screenshot.png)
 
+## ✨ Features
 
-# Sandstorm - Framework PHP Minimaliste
+- 🛍️ **Rich Marketplace Features**
+  - Browse items by category
+  - Advanced search with filters
+  - Real-time messaging between users
+  - Secure payment integration
+  - User ratings and reviews
 
-Sandstorm est une base de code simple pour développer des applications web en PHP en suivant l'architecture MVC (Modèle-Vue-Contrôleur). Ce projet fournit une structure minimale pour organiser votre code et démarrer rapidement un projet.
+- 👤 **User Management**
+  - Secure authentication
+  - User profiles
+  - Seller dashboards
+  - Favorites/watchlist
 
-Prérequis
+- 📱 **Modern UI/UX**
+  - Responsive Bootstrap 5 design
+  - Clean and intuitive interface
+  - Mobile-first approach
+  - Bootstrap Icons integration
 
-PHP 8.2 ou supérieur
+## 🚀 Quick Start
 
-Serveur web Apache avec le module mod_rewrite activé
+1. **Prerequisites**
+   ```bash
+   PHP 8.2+
+   MySQL 8.0+
+   Composer
+   ```
 
-Composer (optionnel pour la gestion des dépendances)
+2. **Clone & Install**
+   ```bash
+   git clone https://github.com/yourusername/Sandstorm.git
+   cd Sandstorm
+   composer install
+   ```
 
-Installation
+3. **Database Setup**
+   ```bash
+   # Import the database schema
+   mysql -u root < database/base.sql
+   ```
 
-Clonez ce dépôt :
+4. **Configuration**
+   ```php
+   # Update database credentials in database/Database.php
+   'host' => 'localhost',
+   'dbname' => 'sandstorm',
+   'user' => 'root',
+   'pass' => ''
+   ```
 
-git clone https://github.com/votre-utilisateur/Sandstorm.git
+5. **Run the Application**
+   ```bash
+   # Using PHP's built-in server
+   php -S localhost:8000
+   
+   # Or configure with Apache/Nginx
+   # Point to the project root directory
+   ```
 
-Placez le projet dans votre serveur web.
+## 🏗️ Architecture
 
-Assurez-vous que le fichier .htaccess est correctement configuré.
+Sandstorm follows the MVC pattern with a clean, modular architecture:
 
-Accédez au projet via votre navigateur.
+```
+Sandstorm/
+├── controllers/    # Business logic
+├── models/        # Database operations
+├── views/         # Twig templates
+├── database/     # Schema & migrations
+└── public/       # Static assets
+```
 
-Configuration du fichier .htaccess
+For detailed architecture documentation, see [Architecture Guide](docs/architecture.md)
 
-Créez un fichier .htaccess à la racine du projet et ajoutez le contenu suivant :
+## 💡 Key Technologies
 
-RewriteEngine On
-RewriteBase /Sandstorm/
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ index.php [QSA,L]
+- **Backend**: PHP 8.2+
+- **Database**: MySQL 8.0+
+- **Routing**: AltoRouter
+- **Templates**: Twig
+- **Frontend**: Bootstrap 5
+- **Icons**: Bootstrap Icons
+- **Dependencies**: Composer
 
-Si votre projet est placé à la racine du serveur, remplacez /Sandstorm/ par /.
+## 🛠️ Development
 
-Structure du projet
+### Running Tests
+```bash
+composer test
+```
 
-/Sandstorm/
-│-- app/
-│   │-- controllers/
-│   │-- models/
-│   │-- views/
-│-- public/
-│   │-- css/
-│   │-- js/
-│-- index.php
-│-- .htaccess
-│-- README.md
+### Code Style
+```bash
+composer cs-fix
+```
 
-app/ : Contient le code MVC (contrôleurs, modèles et vues)
+### Adding Features
+1. Create relevant model in `models/`
+2. Add controller in `controllers/`
+3. Create Twig templates in `views/`
+4. Define routes in `index.php`
 
-public/ : Contient les ressources statiques (CSS, JS)
+## 📝 Documentation
 
-index.php : Point d'entrée principal de l'application
+- [Architecture Guide](docs/architecture.md)
+- [API Documentation](docs/api.md)
+- [Contributing Guide](CONTRIBUTING.md)
+- [Security Policy](SECURITY.md)
 
-.htaccess : Configuration des URL pour Apache
+## 🤝 Contributing
 
-Démarrage
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
 
-Démarrez votre serveur Apache.
+## 📄 License
 
-Accédez à http://localhost/Sandstorm/ dans votre navigateur.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Licence
+## 🙏 Acknowledgments
 
-Ce projet est sous licence MIT. Vous êtes libre de l'utiliser et de le modifier selon vos besoins.
-
-
+- Bootstrap team for the amazing UI framework
+- Twig team for the templating engine
+- AltoRouter for the routing system
+- All our contributors and users!

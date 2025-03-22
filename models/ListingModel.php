@@ -92,6 +92,40 @@ class ListingModel extends Model
     }
 
     /**
+     * Get listings by category with pagination
+     */
+    public function getByCategory(int $categoryId, int $page = 1, int $perPage = 12): array
+    {
+        $offset = ($page - 1) * $perPage;
+        
+        // Count total records for pagination
+        $countStmt = $this->db->prepare("SELECT COUNT(*) FROM {$this->table} WHERE category_id = :category_id AND status = 'active'");
+        $countStmt->execute([':category_id' => $categoryId]);
+        $total = $countStmt->fetchColumn();
+
+        $query = "SELECT l.*, u.username, c.name as category_name, c.slug as category_slug,
+                        (SELECT image_path FROM listing_images WHERE listing_id = l.id AND is_primary = 1 LIMIT 1) as image
+                 FROM {$this->table} l
+                 JOIN users u ON l.user_id = u.id
+                 JOIN categories c ON l.category_id = c.id
+                 WHERE l.category_id = :category_id AND l.status = 'active'
+                 ORDER BY l.created_at DESC
+                 LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return [
+            'items' => $stmt->fetchAll(PDO::FETCH_OBJ),
+            'total' => $total,
+            'total_pages' => ceil($total / $perPage)
+        ];
+    }
+
+    /**
      * Get recent listings with their primary images
      */
     public function getRecentListings(int $limit = 8): array
@@ -208,7 +242,7 @@ class ListingModel extends Model
      */
     public function getUserListings(int $userId, string $status = 'active'): array
     {
-        $query = "SELECT l.*, c.name as category_name,
+        $query = "SELECT l.*, c.name as category_name, c.slug as category_slug,
                         (SELECT image_path FROM listing_images WHERE listing_id = l.id AND is_primary = 1 LIMIT 1) as image
                  FROM {$this->table} l
                  JOIN categories c ON l.category_id = c.id

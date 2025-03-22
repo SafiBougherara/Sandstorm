@@ -36,21 +36,24 @@ class CategoryController extends Controller
      */
     public function view(string $slug)
     {
-        $category = $this->categoryModel->getBySlug($slug, true);
+        $category = $this->categoryModel->getBySlug($slug);
         if (!$category) {
             header('HTTP/1.0 404 Not Found');
-            // TODO: Create 404 template
-            exit('Category not found');
+            echo 'Category not found';
+            exit;
         }
 
         $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $sort = $_GET['sort'] ?? 'newest';
         $listings = $this->listingModel->getByCategory($category->id, $page);
         
         $data = [
             "title" => $category->name,
             "category" => $category,
-            "listings" => $listings,
-            "current_page" => $page
+            "listings" => $listings['items'],
+            "total_pages" => $listings['total_pages'],
+            "current_page" => $page,
+            "sort" => $sort
         ];
 
         $this->render("category.html.twig", $data);
