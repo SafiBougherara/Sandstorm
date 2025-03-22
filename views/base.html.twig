@@ -23,25 +23,28 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/Sandstorm/browse">Browse</a>
                     </li>
-                    {% if session.user_id %}
+                    {% if session.user_id is defined %}
                     <li class="nav-item">
                         <a class="nav-link" href="/Sandstorm/sell">Sell</a>
                     </li>
                     {% endif %}
                 </ul>
-                <div class="d-flex">
-                    {% if session.user_id %}
-                        <div class="dropdown me-3">
-                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle me-1"></i>{{ session.username }}
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="/Sandstorm/dashboard">Dashboard</a></li>
-                                <li><a class="dropdown-item" href="/Sandstorm/profile">Profile</a></li>
-                                <li><a class="dropdown-item" href="/Sandstorm/my-listings">My Listings</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="/Sandstorm/logout">Logout</a></li>
-                            </ul>
+                <div class="d-flex align-items-center">
+                    {% if session.user_id is defined %}
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-person-circle fs-4 me-2"></i>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown">
+                                    {{ session.username }}
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="/Sandstorm/dashboard">Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="/Sandstorm/profile">Profile</a></li>
+                                    <li><a class="dropdown-item" href="/Sandstorm/my-listings">My Listings</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger" href="/Sandstorm/logout">Logout</a></li>
+                                </ul>
+                            </div>
                         </div>
                     {% else %}
                         <a href="/Sandstorm/login" class="btn btn-outline-primary me-2">Login</a>

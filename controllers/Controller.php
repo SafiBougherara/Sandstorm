@@ -21,6 +21,9 @@ class Controller
             'debug' => true, // Active le mode debug
             'cache' => false, // Désactive le cache pendant le développement
         ]);
+
+        // Add session global to all templates
+        $this->twig->addGlobal('session', $_SESSION);
     }
 
     public function render(string $template, array $data = [])
