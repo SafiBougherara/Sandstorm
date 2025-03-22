@@ -74,6 +74,17 @@ class ListingController extends Controller
     }
 
     /**
+     * Search endpoint that redirects to browse with search parameters
+     */
+    public function search()
+    {
+        $query = $_GET['q'] ?? '';
+        $url = '/Sandstorm/browse?' . http_build_query(['q' => $query]);
+        header('Location: ' . $url);
+        exit;
+    }
+
+    /**
      * View listing details
      */
     public function view($id)
