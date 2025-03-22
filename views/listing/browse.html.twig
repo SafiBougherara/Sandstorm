@@ -1,0 +1,123 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Filtres</h5>
+                    <form action="/Sandstorm/browse" method="GET">
+                        <!-- Category Filter -->
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Catégorie</label>
+                            <select class="form-select" id="category" name="category">
+                                <option value="">Toutes les catégories</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}" {% if search.category_id == category.id %}selected{% endif %}>
+                                    {{ category.name }} ({{ category.count }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Price Range -->
+                        <div class="mb-3">
+                            <label class="form-label">Prix</label>
+                            <div class="row g-2">
+                                <div class="col">
+                                    <input type="number" class="form-control" name="min_price" placeholder="Min" value="{{ search.min_price }}" min="0">
+                                </div>
+                                <div class="col">
+                                    <input type="number" class="form-control" name="max_price" placeholder="Max" value="{{ search.max_price }}" min="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sort -->
+                        <div class="mb-3">
+                            <label for="sort" class="form-label">Trier par</label>
+                            <select class="form-select" id="sort" name="sort">
+                                <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Plus récent</option>
+                                <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Prix croissant</option>
+                                <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Prix décroissant</option>
+                            </select>
+                        </div>
+
+                        <!-- Search query (hidden if not searching) -->
+                        {% if search.query is defined and search.query is not empty %}
+                        <input type="hidden" name="q" value="{{ search.query }}">
+                        {% endif %}
+
+                        <button type="submit" class="btn btn-primary w-100">Appliquer les filtres</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Listings Grid -->
+        <div class="col-md-9">
+            <!-- Search Bar -->
+            <div class="mb-4">
+                <form action="/Sandstorm/browse" method="GET" class="d-flex gap-2">
+                    <input type="text" class="form-control" name="q" placeholder="Rechercher..." value="{{ search.query }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+            </div>
+
+            {% if listings|length > 0 %}
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for listing in listings %}
+                <div class="col">
+                    <a href="/Sandstorm/listing/{{ listing.id }}" class="text-decoration-none text-dark">
+                        <div class="card h-100 shadow-sm">
+                            {% if listing.image %}
+                            <img src="/Sandstorm/uploads/listings/{{ listing.image }}" class="card-img-top" alt="{{ listing.title }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                            <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="bi bi-image fs-1"></i>
+                            </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title text-truncate">{{ listing.title }}</h5>
+                                <p class="card-text text-primary fw-bold">{{ listing.price }}€</p>
+                                <p class="card-text text-muted small mb-0">{{ listing.location }}</p>
+                            </div>
+                            <div class="card-footer bg-white">
+                                <small class="text-muted">{{ listing.created_at|date("d/m/Y") }}</small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% for i in 1..total_pages %}
+                    <li class="page-item {% if i == current_page %}active{% endif %}">
+                        <a class="page-link" href="?page={{ i }}{% if search.query %}&q={{ search.query }}{% endif %}{% if search.category_id %}&category={{ search.category_id }}{% endif %}{% if search.min_price %}&min_price={{ search.min_price }}{% endif %}{% if search.max_price %}&max_price={{ search.max_price }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">
+                            {{ i }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox fs-1 text-muted"></i>
+                <h3 class="mt-3">Aucune annonce trouvée</h3>
+                <p class="text-muted">Essayez de modifier vos filtres ou revenez plus tard.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

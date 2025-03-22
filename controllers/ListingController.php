@@ -17,59 +17,39 @@ class ListingController extends Controller
     }
 
     /**
-     * Browse all listings
+     * Browse and search listings
      */
     public function browse()
     {
         $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
         $sort = $_GET['sort'] ?? 'newest';
         
-        $listings = $this->listingModel->getAllListings($page, 12, $sort); // 12 items per page
-        $categories = $this->categoryModel->getAllWithCounts();
-
-        $data = [
-            "title" => "Browse Listings",
-            "listings" => $listings['items'],
-            "total_pages" => $listings['total_pages'],
-            "current_page" => $page,
-            "categories" => $categories,
-            "sort" => $sort
-        ];
-
-        $this->render("listing/browse.html.twig", $data);
-    }
-
-    /**
-     * Search listings
-     */
-    public function search()
-    {
+        // Search and filter parameters
         $query = $_GET['q'] ?? '';
         $categoryId = !empty($_GET['category']) ? intval($_GET['category']) : null;
         $minPrice = !empty($_GET['min_price']) ? floatval($_GET['min_price']) : null;
         $maxPrice = !empty($_GET['max_price']) ? floatval($_GET['max_price']) : null;
-        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-        $sort = $_GET['sort'] ?? 'newest';
 
-        $results = $this->listingModel->searchListings($query, $categoryId, $minPrice, $maxPrice, $page, 12, $sort);
+        // Get listings with search/filters
+        $listings = $this->listingModel->searchListings($query, $categoryId, $minPrice, $maxPrice, $page, 12, $sort);
         $categories = $this->categoryModel->getAllWithCounts();
 
         $data = [
-            "title" => "Search Results" . ($query ? " for '{$query}'" : ""),
-            "listings" => $results['items'],
-            "total_pages" => $results['total_pages'],
+            "title" => empty($query) ? "Browse Listings" : "Search Results for '{$query}'",
+            "listings" => $listings['items'],
+            "total_pages" => $listings['total_pages'],
             "current_page" => $page,
             "categories" => $categories,
+            "sort" => $sort,
             "search" => [
                 "query" => $query,
                 "category_id" => $categoryId,
                 "min_price" => $minPrice,
-                "max_price" => $maxPrice,
-                "sort" => $sort
+                "max_price" => $maxPrice
             ]
         ];
 
-        $this->render("listing/search.html.twig", $data);
+        $this->render("listing/browse.html.twig", $data);
     }
 
     /**

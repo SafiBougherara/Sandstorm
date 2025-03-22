@@ -148,7 +148,7 @@ class ListingModel extends Model
     /**
      * Search listings with filtering and pagination
      */
-    public function searchListings(string $query, ?int $categoryId = null, ?float $minPrice = null, ?float $maxPrice = null, int $page = 1, int $perPage = 12, string $sort = 'newest'): array
+    public function searchListings(string $query = '', ?int $categoryId = null, ?float $minPrice = null, ?float $maxPrice = null, int $page = 1, int $perPage = 12, string $sort = 'newest'): array
     {
         $offset = ($page - 1) * $perPage;
         $params = [];
@@ -198,9 +198,17 @@ class ListingModel extends Model
                  LIMIT :limit OFFSET :offset";
 
         $stmt = $this->db->prepare($query);
-        $params[':limit'] = $perPage;
-        $params[':offset'] = $offset;
-        $stmt->execute($params);
+        
+        // Bind all existing params
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+        
+        // Bind pagination params with explicit types
+        $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        
+        $stmt->execute();
 
         return [
             'items' => $stmt->fetchAll(PDO::FETCH_OBJ),
