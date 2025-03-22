@@ -1,30 +1,30 @@
-# Sandstorm Marketplace Architecture Documentation
+# Documentation de l'Architecture Sandstorm
 
-## Overview
-Sandstorm is a modern marketplace application built with PHP 8.2+ using a custom MVC framework (LightMVC). This document explains the architecture, components, and how to extend the application.
+## Vue d'ensemble
+Sandstorm est une application de marketplace moderne construite avec PHP 8.2+ utilisant un framework MVC personnalisé (LightMVC). Ce document explique l'architecture, les composants et comment étendre l'application.
 
-## Project Structure
+## Structure du Projet
 ```
 Sandstorm/
-├── controllers/         # Controllers handle business logic
-├── models/             # Models manage database interactions
-├── views/              # Twig templates for the UI
-├── database/          # Database schema and migrations
-├── middlewares/       # Request middleware (auth, etc.)
-├── public/            # Public assets (CSS, JS, images)
-├── uploads/           # User-uploaded files
-├── vendor/           # Composer dependencies
-├── .htaccess         # Apache URL rewriting rules
-├── composer.json     # Project dependencies
-└── index.php         # Application entry point
+├── controllers/         # Contrôleurs pour la logique métier
+├── models/             # Modèles pour la gestion de la base de données
+├── views/              # Templates Twig pour l'interface
+├── database/          # Schéma et migrations de la base de données
+├── middlewares/       # Middlewares (auth, etc.)
+├── public/            # Ressources publiques (CSS, JS, images)
+├── uploads/           # Fichiers uploadés par les utilisateurs
+├── vendor/           # Dépendances Composer
+├── .htaccess         # Règles de réécriture Apache
+├── composer.json     # Dépendances du projet
+└── index.php         # Point d'entrée de l'application
 ```
 
-## Core Components
+## Composants Principaux
 
-### 1. Routing System (AltoRouter)
-- All routes are defined in `index.php`
-- Format: `$router->map(METHOD, PATH, CALLBACK)`
-- Example:
+### 1. Système de Routage (AltoRouter)
+- Toutes les routes sont définies dans `index.php`
+- Format : `$router->map(METHODE, CHEMIN, CALLBACK)`
+- Exemple :
 ```php
 $router->map('GET', '/category/[*:slug]', function($slug) {
     $categoryController = new CategoryController(Database::getInstance());
@@ -32,18 +32,18 @@ $router->map('GET', '/category/[*:slug]', function($slug) {
 });
 ```
 
-### 2. Database Layer
-- Located in `database/Database.php`
-- Uses PDO for database connections
-- Singleton pattern for connection management
-- Example usage:
+### 2. Couche Base de Données
+- Située dans `database/Database.php`
+- Utilise PDO pour les connexions
+- Pattern Singleton pour la gestion des connexions
+- Exemple d'utilisation :
 ```php
 $db = Database::getInstance();
 $stmt = $db->prepare("SELECT * FROM users");
 ```
 
-### 3. Models
-All models extend the base `Model` class and handle database operations:
+### 3. Modèles
+Tous les modèles étendent la classe `Model` et gèrent les opérations de base de données :
 ```php
 class UserModel extends Model {
     public function __construct($db) {
@@ -52,14 +52,14 @@ class UserModel extends Model {
 }
 ```
 
-Key Models:
-- `UserModel`: Authentication and user management
-- `CategoryModel`: Category operations
-- `ListingModel`: Marketplace listings
-- `MessageModel`: User messaging system
+Modèles Principaux :
+- `UserModel` : Authentification et gestion des utilisateurs
+- `CategoryModel` : Opérations sur les catégories
+- `ListingModel` : Annonces du marketplace
+- `MessageModel` : Système de messagerie
 
-### 4. Controllers
-Controllers extend the base `Controller` class:
+### 4. Contrôleurs
+Les contrôleurs étendent la classe `Controller` :
 ```php
 class HomeController extends Controller {
     public function index() {
@@ -69,17 +69,17 @@ class HomeController extends Controller {
 }
 ```
 
-Key Controllers:
-- `HomeController`: Main pages
-- `UserController`: Auth & profile
-- `ListingController`: CRUD for listings
-- `CategoryController`: Category views
+Contrôleurs Principaux :
+- `HomeController` : Pages principales
+- `UserController` : Auth & profil
+- `ListingController` : CRUD des annonces
+- `CategoryController` : Vues des catégories
 
-### 5. Views (Twig)
-- Located in `views/`
-- Use Twig templating engine
-- Base template: `base.html.twig`
-- Example:
+### 5. Vues (Twig)
+- Situées dans `views/`
+- Utilise le moteur de template Twig
+- Template de base : `base.html.twig`
+- Exemple :
 ```twig
 {% extends "base.html.twig" %}
 {% block content %}
@@ -87,41 +87,41 @@ Key Controllers:
 {% endblock %}
 ```
 
-### 6. Authentication
-- Handled by `AuthMiddleware`
-- Session-based authentication
-- Protected route example:
+### 6. Authentification
+- Gérée par `AuthMiddleware`
+- Authentification basée sur les sessions
+- Exemple de route protégée :
 ```php
-AuthMiddleware::auth(); // Redirects to login if not authenticated
+AuthMiddleware::auth(); // Redirige vers login si non authentifié
 ```
 
-## Database Schema
+## Schéma de Base de Données
 
-### Key Tables:
+### Tables Principales :
 1. `users`
-   - `id`: Primary key
-   - `username`, `mail`, `pass`: User details
-   - `created_at`, `updated_at`: Timestamps
+   - `id` : Clé primaire
+   - `username`, `mail`, `pass` : Détails utilisateur
+   - `created_at`, `updated_at` : Horodatages
 
 2. `categories`
-   - `id`: Primary key
-   - `name`, `slug`, `icon`: Category details
-   - `parent_id`: For hierarchical categories
+   - `id` : Clé primaire
+   - `name`, `slug`, `icon` : Détails catégorie
+   - `parent_id` : Pour catégories hiérarchiques
 
 3. `listings`
-   - `id`: Primary key
+   - `id` : Clé primaire
    - `title`, `description`, `price`
-   - `user_id`, `category_id`: Foreign keys
-   - `status`: enum('active','sold','expired','draft')
+   - `user_id`, `category_id` : Clés étrangères
+   - `status` : enum('active','sold','expired','draft')
 
 4. `listing_images`
-   - `id`: Primary key
-   - `listing_id`: Foreign key
+   - `id` : Clé primaire
+   - `listing_id` : Clé étrangère
    - `image_path`, `is_primary`
 
-## Adding New Features
+## Ajouter de Nouvelles Fonctionnalités
 
-### 1. Creating a New Model
+### 1. Créer un Nouveau Modèle
 ```php
 namespace Models;
 
@@ -131,12 +131,12 @@ class NewModel extends Model {
     }
     
     public function customMethod() {
-        // Your logic here
+        // Votre logique ici
     }
 }
 ```
 
-### 2. Creating a New Controller
+### 2. Créer un Nouveau Contrôleur
 ```php
 namespace Controllers;
 
@@ -150,46 +150,46 @@ class NewController extends Controller {
     
     public function index() {
         $this->render("new/index.html.twig", [
-            "title" => "New Feature"
+            "title" => "Nouvelle Fonctionnalité"
         ]);
     }
 }
 ```
 
-### 3. Adding New Routes
-In `index.php`:
+### 3. Ajouter de Nouvelles Routes
+Dans `index.php` :
 ```php
-$router->map('GET', '/new-feature', function() {
+$router->map('GET', '/nouvelle-fonction', function() {
     $db = Database::getInstance();
     $controller = new NewController($db);
     $controller->index();
 });
 ```
 
-### 4. Creating Views
-Create a new Twig template in `views/`:
+### 4. Créer des Vues
+Créer un nouveau template Twig dans `views/` :
 ```twig
 {% extends "base.html.twig" %}
 {% block content %}
-    <!-- Your HTML here -->
+    <!-- Votre HTML ici -->
 {% endblock %}
 ```
 
-## Common Tasks
+## Tâches Courantes
 
-### Adding Authentication to a Route
+### Ajouter l'Authentification à une Route
 ```php
-$router->map('GET', '/protected-route', function() {
-    AuthMiddleware::auth(); // Require authentication
+$router->map('GET', '/route-protegee', function() {
+    AuthMiddleware::auth(); // Requiert l'authentification
     $controller = new Controller(Database::getInstance());
     $controller->method();
 });
 ```
 
-### Working with Files
-Upload directory: `uploads/`
+### Travailler avec les Fichiers
+Répertoire d'upload : `uploads/`
 ```php
-// In a controller
+// Dans un contrôleur
 $uploadDir = 'uploads/listings/';
 if (!is_dir($uploadDir)) {
     mkdir($uploadDir, 0777, true);
@@ -197,55 +197,55 @@ if (!is_dir($uploadDir)) {
 move_uploaded_file($tmpName, $uploadDir . $filename);
 ```
 
-### Adding Categories
-Use the SQL in `database/base.sql`:
+### Ajouter des Catégories
+Utiliser le SQL dans `database/base.sql` :
 ```sql
 INSERT INTO categories (name, slug, icon, description) 
-VALUES ('New Category', 'new-category', 'bi-icon', 'Description');
+VALUES ('Nouvelle Catégorie', 'nouvelle-categorie', 'bi-icon', 'Description');
 ```
 
-## Security Considerations
+## Considérations de Sécurité
 
-1. **SQL Injection Prevention**
-   - Always use prepared statements
-   - Never concatenate SQL strings
+1. **Prévention des Injections SQL**
+   - Toujours utiliser des requêtes préparées
+   - Ne jamais concaténer les chaînes SQL
 
-2. **XSS Prevention**
-   - Twig auto-escapes by default
-   - Use `{{ var|raw }}` only when necessary
+2. **Prévention XSS**
+   - Twig échappe automatiquement
+   - Utiliser `{{ var|raw }}` uniquement si nécessaire
 
-3. **CSRF Protection**
-   - Implement CSRF tokens in forms
-   - Validate tokens in POST requests
+3. **Protection CSRF**
+   - Implémenter des tokens CSRF dans les formulaires
+   - Valider les tokens dans les requêtes POST
 
-4. **File Upload Security**
-   - Validate file types
-   - Use secure file names
-   - Set proper permissions
+4. **Sécurité des Uploads**
+   - Valider les types de fichiers
+   - Utiliser des noms de fichiers sécurisés
+   - Définir les bonnes permissions
 
-## Deployment
+## Déploiement
 
-1. Configure your web server (Apache/Nginx)
-2. Set up the database using `database/base.sql`
-3. Update database credentials
-4. Ensure proper file permissions
-5. Configure error reporting for production
+1. Configurer votre serveur web (Apache/Nginx)
+2. Configurer la base de données avec `database/base.sql`
+3. Mettre à jour les identifiants de base de données
+4. Assurer les bonnes permissions de fichiers
+5. Configurer le reporting d'erreurs pour la production
 
-## Troubleshooting
+## Dépannage
 
-### Common Issues:
+### Problèmes Courants :
 
-1. **404 Errors**
-   - Check .htaccess configuration
-   - Verify route definitions
-   - Check file permissions
+1. **Erreurs 404**
+   - Vérifier la configuration .htaccess
+   - Vérifier les définitions de routes
+   - Vérifier les permissions de fichiers
 
-2. **Database Connection Issues**
-   - Verify credentials
-   - Check database server status
-   - Review error logs
+2. **Problèmes de Connexion Base de Données**
+   - Vérifier les identifiants
+   - Vérifier le statut du serveur de base de données
+   - Consulter les logs d'erreurs
 
-3. **Upload Issues**
-   - Check directory permissions
-   - Verify PHP upload settings
-   - Check file size limits
+3. **Problèmes d'Upload**
+   - Vérifier les permissions des répertoires
+   - Vérifier les paramètres PHP d'upload
+   - Vérifier les limites de taille de fichiers

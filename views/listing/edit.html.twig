@@ -1,0 +1,93 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h1 class="text-center mb-4">Modifier l'Annonce</h1>
+                    
+                    {% if error %}
+                    <div class="alert alert-danger">
+                        {{ error }}
+                    </div>
+                    {% endif %}
+
+                    <form action="/Sandstorm/listing/edit/{{ listing.id }}" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Titre de l'annonce</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ listing.title }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Catégorie</label>
+                            <select class="form-select" id="category" name="category_id" required>
+                                <option value="">Choisir une catégorie</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}" {% if category.id == listing.category_id %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="5" required>{{ listing.description }}</textarea>
+                            <div class="form-text">Décrivez votre article en détail (état, caractéristiques, etc.)</div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="price" class="form-label">Prix (€)</label>
+                                <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" value="{{ listing.price }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="location" class="form-label">Localisation</label>
+                                <input type="text" class="form-control" id="location" name="location" value="{{ listing.location }}" required>
+                            </div>
+                        </div>
+
+                        <!-- Current Images -->
+                        {% if listing.images|length > 0 %}
+                        <div class="mb-3">
+                            <label class="form-label">Images actuelles</label>
+                            <div class="row g-3">
+                                {% for image in listing.images %}
+                                <div class="col-4">
+                                    <div class="position-relative">
+                                        <img src="/Sandstorm/uploads/listings/{{ image.image_path }}" class="img-thumbnail" alt="Image {{ loop.index }}">
+                                        <div class="form-check position-absolute top-0 end-0 m-2">
+                                            <input class="form-check-input" type="checkbox" name="delete_images[]" value="{{ image.id }}" id="delete_image_{{ image.id }}">
+                                            <label class="form-check-label" for="delete_image_{{ image.id }}">
+                                                Supprimer
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="images" class="form-label">Ajouter des photos</label>
+                            <input type="file" class="form-control" id="images" name="images[]" accept="image/*" multiple>
+                            <div class="form-text">
+                                Vous pouvez sélectionner plusieurs photos. La première sera l'image principale.
+                                Formats acceptés : JPG, PNG, GIF. Max 5MB par image.
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Mettre à jour l'annonce</button>
+                            <a href="/Sandstorm/listing/{{ listing.id }}" class="btn btn-outline-secondary">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

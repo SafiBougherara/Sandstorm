@@ -18,8 +18,8 @@ class UserController extends Controller
     public function login()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = $_POST['mail'] ?? '';
-            $password = $_POST['pass'] ?? '';
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
 
             if (!empty($email) && !empty($password)) {
                 $userId = $this->userModel->authenticate($email, $password);
@@ -28,20 +28,20 @@ class UserController extends Controller
                     $user = $this->userModel->getUserById($userId);
                     $_SESSION['user_id'] = $user->id;
                     $_SESSION['username'] = $user->username;
-                    $_SESSION['email'] = $user->mail;
+                    $_SESSION['email'] = $user->email;
                     
                     header('Location: /Sandstorm/');
                     exit;
                 } else {
-                    $error = 'Invalid email or password';
+                    $error = 'Email ou mot de passe invalide';
                 }
             } else {
-                $error = 'Please fill in all fields';
+                $error = 'Veuillez remplir tous les champs';
             }
         }
 
         $data = [
-            "title" => "Login",
+            "title" => "Connexion",
             "error" => $error ?? null
         ];
 
@@ -55,9 +55,9 @@ class UserController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = $_POST['username'] ?? '';
-            $email = $_POST['mail'] ?? '';
-            $password = $_POST['pass'] ?? '';
-            $passwordConfirm = $_POST['pass_confirm'] ?? '';
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
+            $passwordConfirm = $_POST['password_confirm'] ?? '';
 
             if (!empty($username) && !empty($email) && !empty($password) && !empty($passwordConfirm)) {
                 if ($password === $passwordConfirm) {
@@ -65,7 +65,7 @@ class UserController extends Controller
                         try {
                             // Check if email already exists
                             if ($this->userModel->getUserByEmail($email)) {
-                                $error = 'Email already registered';
+                                $error = 'Email déjà enregistré';
                             } else {
                                 $userId = $this->userModel->register($username, $email, $password);
 
@@ -73,30 +73,30 @@ class UserController extends Controller
                                     $user = $this->userModel->getUserById($userId);
                                     $_SESSION['user_id'] = $user->id;
                                     $_SESSION['username'] = $user->username;
-                                    $_SESSION['email'] = $user->mail;
+                                    $_SESSION['email'] = $user->email;
                                     
                                     header('Location: /Sandstorm/');
                                     exit;
                                 } else {
-                                    $error = 'Registration failed';
+                                    $error = 'Échec de l\'inscription';
                                 }
                             }
                         } catch (\PDOException $e) {
-                            $error = 'Registration error: ' . $e->getMessage();
+                            $error = 'Erreur d\'inscription: ' . $e->getMessage();
                         }
                     } else {
-                        $error = 'Password must be at least 8 characters long';
+                        $error = 'Le mot de passe doit contenir au moins 8 caractères';
                     }
                 } else {
-                    $error = 'Passwords do not match';
+                    $error = 'Les mots de passe ne correspondent pas';
                 }
             } else {
-                $error = 'Please fill in all fields';
+                $error = 'Veuillez remplir tous les champs';
             }
         }
 
         $data = [
-            "title" => "Register",
+            "title" => "Inscription",
             "error" => $error ?? null
         ];
 
