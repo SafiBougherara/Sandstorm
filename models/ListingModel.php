@@ -71,7 +71,7 @@ class ListingModel extends Model
         };
 
         $query = "SELECT l.*, u.username, c.name as category_name, c.slug as category_slug,
-                        (SELECT image_path FROM listing_images WHERE listing_id = l.id AND is_primary = 1 LIMIT 1) as image
+                        (SELECT li.image_path FROM listing_images li WHERE li.listing_id = l.id AND li.is_primary = 1 LIMIT 1) as image
                  FROM {$this->table} l
                  JOIN users u ON l.user_id = u.id
                  JOIN categories c ON l.category_id = c.id
@@ -104,7 +104,7 @@ class ListingModel extends Model
         $total = $countStmt->fetchColumn();
 
         $query = "SELECT l.*, u.username, c.name as category_name, c.slug as category_slug,
-                        (SELECT image_path FROM listing_images WHERE listing_id = l.id AND is_primary = 1 LIMIT 1) as image
+                        (SELECT li.image_path FROM listing_images li WHERE li.listing_id = l.id AND li.is_primary = 1 LIMIT 1) as image
                  FROM {$this->table} l
                  JOIN users u ON l.user_id = u.id
                  JOIN categories c ON l.category_id = c.id
@@ -131,7 +131,7 @@ class ListingModel extends Model
     public function getRecentListings(int $limit = 8): array
     {
         $query = "SELECT l.*, u.username, c.name as category_name, c.slug as category_slug,
-                        (SELECT image_path FROM listing_images WHERE listing_id = l.id AND is_primary = 1 LIMIT 1) as image
+                        (SELECT li.image_path FROM listing_images li WHERE li.listing_id = l.id AND li.is_primary = 1 LIMIT 1) as image
                  FROM {$this->table} l
                  JOIN users u ON l.user_id = u.id
                  JOIN categories c ON l.category_id = c.id
@@ -189,7 +189,7 @@ class ListingModel extends Model
 
         // Main query
         $query = "SELECT l.*, u.username, c.name as category_name, c.slug as category_slug,
-                        (SELECT image_path FROM listing_images WHERE listing_id = l.id AND is_primary = 1 LIMIT 1) as image
+                        (SELECT li.image_path FROM listing_images li WHERE li.listing_id = l.id AND li.is_primary = 1 LIMIT 1) as image
                  FROM {$this->table} l
                  JOIN users u ON l.user_id = u.id
                  JOIN categories c ON l.category_id = c.id
@@ -251,7 +251,7 @@ class ListingModel extends Model
     public function getUserListings(int $userId, string $status = 'active'): array
     {
         $query = "SELECT l.*, c.name as category_name, c.slug as category_slug,
-                        (SELECT image_path FROM listing_images WHERE listing_id = l.id AND is_primary = 1 LIMIT 1) as image
+                        (SELECT li.image_path FROM listing_images li WHERE li.listing_id = l.id AND li.is_primary = 1 LIMIT 1) as image
                  FROM {$this->table} l
                  JOIN categories c ON l.category_id = c.id
                  WHERE l.user_id = :user_id";
@@ -269,5 +269,29 @@ class ListingModel extends Model
         }
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    /**
+     * Delete a listing and its images
+     */
+    public function deleteListing(int $id): bool
+    {
+        $this->db->beginTransaction();
+
+        try {
+            // Delete listing images from database
+            $stmt = $this->db->prepare("DELETE FROM listing_images WHERE listing_id = :id");
+            $stmt->execute([':id' => $id]);
+
+            // Delete the listing
+            $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE id = :id");
+            $stmt->execute([':id' => $id]);
+
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
     }
 }

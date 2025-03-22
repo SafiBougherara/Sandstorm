@@ -15,7 +15,7 @@
         <div class="col">
             <div class="card h-100 shadow-sm">
                 {% if listing.image %}
-                <img src="/Sandstorm/uploads/listings/{{ listing.image }}" class="card-img-top" alt="{{ listing.title }}" style="height: 200px; object-fit: cover;">
+                <img src="{{ listing.image }}" class="card-img-top" alt="{{ listing.title }}" style="height: 200px; object-fit: cover;">
                 {% else %}
                 <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
                     <i class="bi bi-image fs-1"></i>

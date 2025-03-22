@@ -17,6 +17,23 @@ class ListingController extends Controller
     }
 
     /**
+     * Add base URL to image paths
+     */
+    private function processListingImages($listings)
+    {
+        if (is_array($listings)) {
+            foreach ($listings as $listing) {
+                if (isset($listing->image) && $listing->image) {
+                    $listing->image = '/Sandstorm/uploads/listings/' . $listing->image;
+                }
+            }
+        } elseif (is_object($listings) && isset($listings->image) && $listings->image) {
+            $listings->image = '/Sandstorm/uploads/listings/' . $listings->image;
+        }
+        return $listings;
+    }
+
+    /**
      * Browse and search listings
      */
     public function browse()
@@ -32,6 +49,10 @@ class ListingController extends Controller
 
         // Get listings with search/filters
         $listings = $this->listingModel->searchListings($query, $categoryId, $minPrice, $maxPrice, $page, 12, $sort);
+        
+        // Process image paths for each listing
+        $listings['items'] = $this->processListingImages($listings['items']);
+        
         $categories = $this->categoryModel->getAllWithCounts();
 
         $data = [
@@ -55,14 +76,20 @@ class ListingController extends Controller
     /**
      * View listing details
      */
-    public function view(int $id)
+    public function view($id)
     {
         $listing = $this->listingModel->getListingDetails($id);
         
         if (!$listing) {
-            header('HTTP/1.0 404 Not Found');
-            echo 'Listing not found';
+            header('Location: /Sandstorm/browse');
             exit;
+        }
+
+        // Process images
+        if ($listing->images) {
+            foreach ($listing->images as $image) {
+                $image->image_path = '/Sandstorm/uploads/listings/' . $image->image_path;
+            }
         }
 
         $data = [
@@ -171,6 +198,64 @@ class ListingController extends Controller
         }
 
         header('Location: /Sandstorm/sell');
+        exit;
+    }
+
+    /**
+     * Display user's listings
+     */
+    public function myListings()
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /Sandstorm/login');
+            exit;
+        }
+
+        $listings = $this->listingModel->getUserListings($_SESSION['user_id']);
+        $listings = $this->processListingImages($listings);
+
+        $data = [
+            "title" => "My Listings",
+            "listings" => $listings
+        ];
+
+        $this->render("user/my-listings.html.twig", $data);
+    }
+
+    /**
+     * Delete a listing
+     */
+    public function delete($id)
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /Sandstorm/login');
+            exit;
+        }
+
+        // Get the listing
+        $listing = $this->listingModel->getListingDetails($id);
+        
+        // Check if listing exists and belongs to user
+        if (!$listing || $listing->user_id != $_SESSION['user_id']) {
+            header('Location: /Sandstorm/my-listings');
+            exit;
+        }
+
+        // Delete the listing's images from disk
+        if ($listing->images) {
+            $uploadDir = __DIR__ . '/../public/uploads/listings/';
+            foreach ($listing->images as $image) {
+                $filePath = $uploadDir . basename($image->image_path);
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+            }
+        }
+
+        // Delete the listing from database
+        $this->listingModel->deleteListing($id);
+
+        header('Location: /Sandstorm/my-listings');
         exit;
     }
 }
