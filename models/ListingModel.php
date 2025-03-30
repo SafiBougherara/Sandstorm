@@ -294,4 +294,63 @@ class ListingModel extends Model
             throw $e;
         }
     }
+
+    /**
+     * Update a listing and its images
+     */
+    public function updateListing(int $id, array $data, array $newImages = [], array $deleteImageIds = []): bool
+    {
+        $this->db->beginTransaction();
+
+        try {
+            // Update listing details
+            $stmt = $this->db->prepare("UPDATE {$this->table} 
+                                      SET title = :title, 
+                                          description = :description, 
+                                          price = :price, 
+                                          location = :location, 
+                                          category_id = :category_id
+                                      WHERE id = :id");
+            
+            $stmt->execute([
+                ':id' => $id,
+                ':title' => $data['title'],
+                ':description' => $data['description'],
+                ':price' => $data['price'],
+                ':location' => $data['location'],
+                ':category_id' => $data['category_id']
+            ]);
+
+            // Delete selected images
+            if (!empty($deleteImageIds)) {
+                $placeholders = str_repeat('?,', count($deleteImageIds) - 1) . '?';
+                $stmt = $this->db->prepare("DELETE FROM listing_images WHERE id IN ({$placeholders})");
+                $stmt->execute($deleteImageIds);
+            }
+
+            // Add new images
+            if (!empty($newImages)) {
+                $stmt = $this->db->prepare("INSERT INTO listing_images (listing_id, image_path, is_primary) VALUES (:listing_id, :image_path, :is_primary)");
+                
+                // Check if listing has any existing images
+                $checkStmt = $this->db->prepare("SELECT COUNT(*) FROM listing_images WHERE listing_id = ?");
+                $checkStmt->execute([$id]);
+                $hasExistingImages = $checkStmt->fetchColumn() > 0;
+
+                foreach ($newImages as $index => $image) {
+                    $stmt->execute([
+                        ':listing_id' => $id,
+                        ':image_path' => $image,
+                        ':is_primary' => (!$hasExistingImages && $index === 0) ? 1 : 0
+                    ]);
+                }
+            }
+
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
 }

@@ -68,6 +68,27 @@ $router->map('POST', '/listing/store', function() {
     $listingController->store();
 });
 
+$router->map('GET', '/listing/[i:id]/edit', function($id) {
+    AuthMiddleware::auth();
+    $db = Database::getInstance();
+    $listingController = new ListingController($db);
+    $listingController->edit($id);
+});
+
+$router->map('POST', '/listing/[i:id]/update', function($id) {
+    AuthMiddleware::auth();
+    $db = Database::getInstance();
+    $listingController = new ListingController($db);
+    $listingController->update($id);
+});
+
+$router->map('POST', '/listing/[i:id]/delete', function($id) {
+    AuthMiddleware::auth();
+    $db = Database::getInstance();
+    $listingController = new ListingController($db);
+    $listingController->delete($id);
+});
+
 // User routes
 $router->map('GET', '/register', function () {
     $db = Database::getInstance();
@@ -125,20 +146,6 @@ $router->map('GET', '/my-listings', function() {
     $db = Database::getInstance();
     $userController = new UserController($db);
     $userController->myListings();
-});
-
-$router->map('GET|POST', '/listing/edit/[i:id]', function($id) {
-    AuthMiddleware::auth();
-    $db = Database::getInstance();
-    $listingController = new ListingController($db);
-    $listingController->edit($id);
-});
-
-$router->map('POST', '/listing/delete/[i:id]', function($id) {
-    AuthMiddleware::auth();
-    $db = Database::getInstance();
-    $listingController = new ListingController($db);
-    $listingController->delete($id);
 });
 
 // Matcher et gérer la requête

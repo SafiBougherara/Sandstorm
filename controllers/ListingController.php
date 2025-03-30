@@ -269,4 +269,124 @@ class ListingController extends Controller
         header('Location: /Sandstorm/my-listings');
         exit;
     }
+
+    /**
+     * Display listing edit form
+     */
+    public function edit($id)
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /Sandstorm/login');
+            exit;
+        }
+
+        // Get the listing
+        $listing = $this->listingModel->getListingDetails($id);
+        
+        // Check if listing exists and belongs to user
+        if (!$listing || $listing->user_id != $_SESSION['user_id']) {
+            header('Location: /Sandstorm/my-listings');
+            exit;
+        }
+
+        $categories = $this->categoryModel->getAllWithCounts();
+        
+        $data = [
+            "title" => "Edit Listing",
+            "listing" => $listing,
+            "categories" => $categories
+        ];
+
+        $this->render("listing/edit.html.twig", $data);
+    }
+
+    /**
+     * Handle listing update
+     */
+    public function update($id)
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /Sandstorm/login');
+            exit;
+        }
+
+        // Get the listing
+        $listing = $this->listingModel->getListingDetails($id);
+        
+        // Check if listing exists and belongs to user
+        if (!$listing || $listing->user_id != $_SESSION['user_id']) {
+            header('Location: /Sandstorm/my-listings');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $title = $_POST['title'] ?? '';
+            $description = $_POST['description'] ?? '';
+            $price = $_POST['price'] ?? '';
+            $location = $_POST['location'] ?? '';
+            $categoryId = $_POST['category_id'] ?? '';
+
+            $errors = [];
+            if (empty($title)) $errors[] = "Title is required";
+            if (empty($description)) $errors[] = "Description is required";
+            if (empty($price) || !is_numeric($price)) $errors[] = "Valid price is required";
+            if (empty($location)) $errors[] = "Location is required";
+            if (empty($categoryId)) $errors[] = "Category is required";
+
+            if (empty($errors)) {
+                $images = [];
+                if (!empty($_FILES['images'])) {
+                    $uploadDir = 'uploads/listings/';
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+
+                    foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
+                        if ($_FILES['images']['error'][$key] === UPLOAD_ERR_OK) {
+                            $filename = uniqid() . '_' . $_FILES['images']['name'][$key];
+                            $filepath = $uploadDir . $filename;
+                            
+                            if (move_uploaded_file($tmp_name, $filepath)) {
+                                $images[] = $filepath;
+                            }
+                        }
+                    }
+                }
+
+                try {
+                    $success = $this->listingModel->updateListing($id, [
+                        'title' => $title,
+                        'description' => $description,
+                        'price' => $price,
+                        'location' => $location,
+                        'category_id' => $categoryId
+                    ], $images);
+
+                    if ($success) {
+                        header('Location: /Sandstorm/listing/' . $id);
+                        exit;
+                    } else {
+                        $errors[] = "Failed to update listing";
+                    }
+                } catch (\Exception $e) {
+                    $errors[] = "Error updating listing: " . $e->getMessage();
+                }
+            }
+
+            if (!empty($errors)) {
+                $data = [
+                    "title" => "Edit Listing",
+                    "listing" => $listing,
+                    "categories" => $this->categoryModel->getAllWithCounts(),
+                    "errors" => $errors,
+                    "old" => $_POST
+                ];
+                $this->render("listing/edit.html.twig", $data);
+                return;
+            }
+        }
+
+        header('Location: /Sandstorm/listing/' . $id . '/edit');
+        exit;
+    }
 }
