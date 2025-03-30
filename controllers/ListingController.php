@@ -24,11 +24,11 @@ class ListingController extends Controller
         if (is_array($listings)) {
             foreach ($listings as $listing) {
                 if (isset($listing->image) && $listing->image) {
-                    $listing->image = '/Sandstorm/uploads/listings/' . $listing->image;
+                    $listing->image = $listing->image;
                 }
             }
         } elseif (is_object($listings) && isset($listings->image) && $listings->image) {
-            $listings->image = '/Sandstorm/uploads/listings/' . $listings->image;
+            $listings->image = $listings->image;
         }
         return $listings;
     }
@@ -99,7 +99,7 @@ class ListingController extends Controller
         // Process images
         if ($listing->images) {
             foreach ($listing->images as $image) {
-                $image->image_path = '/Sandstorm/uploads/listings/' . $image->image_path;
+                $image->image_path = $image->image_path;
             }
         }
 
