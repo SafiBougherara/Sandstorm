@@ -152,7 +152,7 @@ class UserController extends Controller
     }
 
     /**
-     * Display user profile
+     * Display and handle user profile updates
      */
     public function profile()
     {
@@ -162,10 +162,79 @@ class UserController extends Controller
         }
 
         $user = $this->userModel->getUserById($_SESSION['user_id']);
+        $error = null;
+        $success = null;
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = $_POST['username'] ?? '';
+            $email = $_POST['email'] ?? '';
+            $currentPassword = $_POST['current_password'] ?? '';
+            $newPassword = $_POST['new_password'] ?? '';
+            $newPasswordConfirm = $_POST['new_password_confirm'] ?? '';
+
+            // Verify current password
+            if (empty($currentPassword)) {
+                $error = 'Current password is required to make changes';
+            } else if (!$this->userModel->authenticate($user->mail, $currentPassword)) {
+                $error = 'Current password is incorrect';
+            } else {
+                try {
+                    $updateData = [];
+
+                    // Check if username changed
+                    if ($username !== $user->username) {
+                        $updateData['username'] = $username;
+                    }
+
+                    // Check if email changed
+                    if ($email !== $user->mail) {
+                        // Check if new email is already taken
+                        if ($this->userModel->getUserByEmail($email)) {
+                            $error = 'This email is already registered';
+                        } else {
+                            $updateData['mail'] = $email;
+                        }
+                    }
+
+                    // Handle password change if requested
+                    if (!empty($newPassword)) {
+                        if (strlen($newPassword) < 8) {
+                            $error = 'New password must be at least 8 characters long';
+                        } else if ($newPassword !== $newPasswordConfirm) {
+                            $error = 'New passwords do not match';
+                        } else {
+                            // Update password separately
+                            $this->userModel->changePassword($_SESSION['user_id'], $newPassword);
+                        }
+                    }
+
+                    // Update profile if there are changes and no errors
+                    if (!empty($updateData) && !$error) {
+                        if ($this->userModel->updateProfile($_SESSION['user_id'], $updateData)) {
+                            // Update session data
+                            $_SESSION['username'] = $username;
+                            $_SESSION['email'] = $email;
+                            $success = 'Profile updated successfully';
+                            
+                            // Refresh user data
+                            $user = $this->userModel->getUserById($_SESSION['user_id']);
+                        } else {
+                            $error = 'Failed to update profile';
+                        }
+                    } else if (!$error && empty($updateData) && empty($newPassword)) {
+                        $error = 'No changes were made';
+                    }
+                } catch (\Exception $e) {
+                    $error = 'Error updating profile: ' . $e->getMessage();
+                }
+            }
+        }
 
         $data = [
             "title" => "Profile",
-            "user" => $user
+            "user" => $user,
+            "error" => $error,
+            "success" => $success
         ];
 
         $this->render("user/profile.html.twig", $data);
