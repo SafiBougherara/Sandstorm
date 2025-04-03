@@ -19,9 +19,9 @@ composer.phar
 *.log
 *.cache
 
-# Uploaded files
-/public/uploads/
-/uploads/
+## Uploaded files
+#/public/uploads/
+#/uploads/
 
 # OS generated files
 .DS_Store

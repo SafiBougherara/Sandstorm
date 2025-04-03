@@ -254,7 +254,7 @@ class ListingController extends Controller
 
         // Delete the listing's images from disk
         if ($listing->images) {
-            $uploadDir = __DIR__ . '/../public/uploads/listings/';
+            $uploadDir = __DIR__ . '/../uploads/listings/';
             foreach ($listing->images as $image) {
                 $filePath = $uploadDir . basename($image->image_path);
                 if (file_exists($filePath)) {
