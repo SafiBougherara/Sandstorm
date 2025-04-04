@@ -88,7 +88,7 @@
                         <small class="text-muted">{{ listing.seller_listing_count }} active listings</small>
                     </div>
                     {% endif %}
-
+<!--
                     {% if session.user_id and session.user_id != listing.user_id %}
                     <div class="d-grid gap-2">
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contactModal">
@@ -98,6 +98,8 @@
                             <i class="bi bi-heart me-2"></i>Add to Favorites
                         </button>
                     </div>
+-->
+
                     {% elseif not session.user_id %}
                     <div class="alert alert-info mb-0">
                         <a href="/Sandstorm/login">Login</a> or <a href="/Sandstorm/register">Register</a> to contact the seller
